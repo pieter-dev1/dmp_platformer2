@@ -39,11 +39,19 @@ public class EntityMovement : MonoBehaviour
             var vector = Vector3.zero;
             var groundUpAxisIndex = comps.entityStats.upAxis.index;
             if (groundUpAxisIndex == 0) //player hit wall from the side
-                vector = new Vector3(0, -direction.x, direction.y);
+            { 
+                vector = Vector3.up * direction.x + Vector3.forward * direction.y;
+                if (comps.entityStats.upAxis.positive)
+                    vector.y *= -1;
+            }
             else if (groundUpAxisIndex == 1) //player hit wall from above/below
                 vector = Vector3.right * direction.x + Vector3.forward * direction.y;
             else //player hit wall from the front/back
+            { 
                 vector = Vector3.right * direction.x + Vector3.up * direction.y;
+                if (comps.entityStats.upAxis.positive)
+                    vector.y *= -1;
+            }
 
             var movement = (vector) * Time.deltaTime * (moveSpeed * comps.entityStats.moveSpeedRatio);
             transform.rotation = Quaternion.LookRotation(movement, comps.entityStats.groundUp); //rotation
@@ -56,15 +64,25 @@ public class EntityMovement : MonoBehaviour
 
     private void ApplyGravity()
     {
-        if (comps.fauxAttractor != null && comps.fauxAttractor.enabled)
-        {
-            var currSurfaceDirection = comps.fauxAttractor.currentSurface.position - transform.position;
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, currSurfaceDirection, out hit, Vector3.Distance(comps.fauxAttractor.currentSurface.position, transform.position)))
-                comps.rigidbody.AddForce(-(hit.point - transform.position).normalized * gravity);
-        }
-        else
-            comps.rigidbody.AddForce(comps.entityStats.groundUp * gravity);
+        //if (!comps.entityStats.grounded && comps.fauxAttractor != null && comps.fauxAttractor.enabled)
+        //{
+        //    RaycastHit hit;
+        //    var surfaceColl = comps.fauxAttractor.currentSurface.GetComponent<Collider>();
+        //    var surfacePoint = Physics.ClosestPoint(transform.position, surfaceColl, surfaceColl.transform.position, surfaceColl.transform.rotation);
+        //    var distance = Vector3.Distance(transform.position, surfacePoint);
+        //    if (Physics.Raycast(comps.fauxAttractor.cornerDetector.position, surfacePoint - transform.position, out hit))
+        //    {
+        //        if (hit.normal != comps.entityStats.groundUp)
+        //        {
+        //            //print($"diff normal: {hit.normal}");
+        //            comps.entityStats.groundUp = hit.normal;
+
+        //        }
+        //        comps.rigidbody.AddForce(-(surfacePoint).normalized * gravity);
+        //    }
+        //}
+        //else
+         comps.rigidbody.AddForce(comps.entityStats.groundUp * gravity);
     }
 
     public void CancelMovement()

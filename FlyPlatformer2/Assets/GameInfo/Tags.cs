@@ -8,4 +8,5 @@ public static class Tags
     public const string GROUND = "Ground";
     public const string WALL = "Wall";
     public const string CEILING = "Ceiling";
+    public const string CHECKPOINT = "Checkpoint";
 }
